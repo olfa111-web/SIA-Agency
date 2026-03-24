@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIA Agency | Strategic Impact & Automation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #4a4a4a;
+            --accent: #3d9fdb;
+            --accent-light: #5eb8f0;
+            --accent-dark: #2b7fb8;
+            --light: #f5f5f5;
+            --cream: #fafafa;
+            --gold: #c9a961;
+            --dark: #0a0a0a;
+            --gradient: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            --accent-gradient: linear-gradient(135deg, #3d9fdb 0%, #5eb8f0 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            color: var(--dark);
+            background: var(--cream);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(250, 250, 250, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: var(--cream);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 150%;
+            background: var(--gradient);
+            opacity: 0.03;
+            border-radius: 50%;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-50px, 50px) rotate(5deg); }
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 6rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-label {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: var(--accent-gradient);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: 50px;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease 0.3s both;
+            box-shadow: 0 5px 20px rgba(61, 159, 219, 0.3);
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .hero h1 .highlight {
+            color: var(--accent);
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero h1 .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: var(--accent-light);
+            opacity: 0.25;
+            z-index: -1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            line-height: 1.8;
+            margin-bottom: 3rem;
+            font-weight: 400;
+            animation: fadeInUp 0.8s ease 0.5s both;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 10px 30px rgba(61, 159, 219, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(61, 159, 219, 0.45);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+            animation: fadeInUp 0.8s ease 0.7s both;
+        }
+
+        .visual-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(26, 26, 26, 0.15);
+            position: relative;
+        }
+
+        .visual-card::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: var(--gradient);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.05;
+        }
+
+        .values-list {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .value-item {
+            display: flex;
+            align-items: start;
+            gap: 1.2rem;
+        }
+
+        .value-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .value-text h4 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+        }
+
+        .value-text p {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        /* Main Content with Sidebar Layout */
+        .content-with-sidebar {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 3rem;
+            padding: 0 2rem;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 8rem 0;
+            background: white;
+            position: relative;
+        }
+
+        .services::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 5rem;
+            padding: 0 2rem;
+        }
+
+        .section-label {
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            line-height: 1.8;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+        }
+
+        .service-card {
+            background: var(--cream);
+            padding: 3rem;
+            border-radius: 16px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--accent);
+            transition: height 0.4s ease;
+        }
+
+        .service-card:hover::before {
+            height: 100%;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(26, 26, 26, 0.15);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--accent-gradient);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 5px 20px rgba(61, 159, 219, 0.3);
+        }
+
+        .service-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .service-card p {
+            color: var(--secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-features {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+
+        .service-features li {
+            padding: 0.5rem 0;
+            color: var(--dark);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .service-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* RSS Sidebar */
+        .rss-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .rss-widget {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(26, 26, 26, 0.1);
+            border-top: 4px solid var(--accent);
+        }
+
+        .rss-widget h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .rss-subtitle {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .rss-feed {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .rss-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .rss-feed::-webkit-scrollbar-track {
+            background: var(--cream);
+            border-radius: 10px;
+        }
+
+        .rss-feed::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .rss-item {
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            background: var(--cream);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .rss-item:hover {
+            background: white;
+            box-shadow: 0 5px 15px rgba(61, 159, 219, 0.2);
+            transform: translateX(5px);
+        }
+
+        .rss-item-title {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .rss-item-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .rss-item-program {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background: rgba(61, 159, 219, 0.1);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .rss-loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--secondary);
+        }
+
+        /* Proposals Section */
+        .proposals {
+            padding: 8rem 0;
+            background: var(--cream);
+        }
+
+        .proposals-tabs {
+            margin-top: 3rem;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+        }
+
+        .tab-btn.active::after {
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .proposals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .proposal-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(26, 26, 26, 0.1);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--accent);
+        }
+
+        .proposal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(26, 26, 26, 0.15);
+        }
+
+        .proposal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .proposal-program {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: rgba(61, 159, 219, 0.15);
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+        }
+
+        .proposal-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .proposal-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .proposal-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .proposal-description {
+            color: var(--secondary);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .positions-needed {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .positions-needed h4 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .position-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .position-tag {
+            padding: 0.5rem 1rem;
+            background: var(--cream);
+            color: var(--primary);
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .position-tag:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 3px 10px rgba(61, 159, 219, 0.3);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 8rem 2rem;
+            background: white;
+        }
+
+        .contact-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .contact-form {
+            background: var(--cream);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(26, 26, 26, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(61, 159, 219, 0.35);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(61, 159, 219, 0.45);
+        }
+
+        #positionField {
+            display: none;
+        }
+
+        #positionField.active {
+            display: block;
+        }
+
+        /* Vision Section */
+        .vision-section {
+            padding: 7rem 2rem;
+            background: var(--dark);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vision-section::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 60%;
+            height: 180%;
+            background: radial-gradient(circle, rgba(61, 159, 219, 0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .vision-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .vision-top {
+            text-align: center;
+            max-width: 860px;
+            margin: 0 auto 5rem;
+        }
+
+        .vision-top .section-label {
+            color: var(--accent);
+        }
+
+        .vision-top .section-title {
+            color: white;
+        }
+
+        .vision-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .vision-card {
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .vision-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(61, 159, 219, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .vision-card-label {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            padding: 0.4rem 1rem;
+            border: 1px solid rgba(61, 159, 219, 0.3);
+            border-radius: 50px;
+        }
+
+        .vision-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .vision-card p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.9;
+        }
+
+        .vision-card p strong {
+            color: white;
+            font-weight: 500;
+        }
+
+        .vision-pillars {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+            padding-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .vision-pillar {
+            text-align: center;
+        }
+
+        .vision-pillar-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .vision-pillar h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.5px;
+        }
+
+        .vision-pillar p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .vision-cards {
+                grid-template-columns: 1fr;
+            }
+            .vision-pillars {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Why SIA Section */
+        .why-sia {
+            padding: 8rem 2rem;
+            background: var(--primary);
+            color: white;
+        }
+
+        .why-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .why-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 2rem;
+            line-height: 1.2;
+        }
+
+        .why-text {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.9;
+            margin-bottom: 3rem;
+        }
+
+        .benefits {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .benefit-item {
+            display: flex;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .benefit-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            color: white;
+            box-shadow: 0 5px 20px rgba(61, 159, 219, 0.4);
+        }
+
+        .benefit-text h4 {
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .benefit-text p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .why-image {
+            position: relative;
+            padding: 2rem;
+        }
+
+        .image-frame {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .image-frame::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            background: var(--accent);
+            border-radius: 20px;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .placeholder-img {
+            width: 100%;
+            height: 400px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content-with-sidebar {
+                grid-template-columns: 1fr;
+            }
+
+            .rss-sidebar {
+                position: relative;
+                top: 0;
+                order: -1;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .why-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 3rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .proposals-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .cta-group {
+                flex-direction: column;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-nav {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">SIA <span>Agency</span></a>
+            <ul class="nav-links">
+                <li><a href="#services">Services</a></li>
+                <li><a href="#proposals">Proposals</a></li>
+                <li><a href="#vision">Vision</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <span class="hero-label">Strategic Impact & Automation</span>
+                <h1>
+                    Your Consortium Partner for <span class="highlight">EU Project</span> Dissemination
+                </h1>
+                <p class="hero-subtitle">
+                    SIA Agency embeds dissemination expertise directly into your consortium — ensuring your EU-funded research and innovation reaches the stakeholders, policymakers, and communities that matter most.
+                </p>
+                <div class="cta-group">
+                    <a href="#contact" class="btn btn-primary">Invite Us to Your Consortium</a>
+                    <a href="#proposals" class="btn btn-secondary">Explore Collaborations</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="visual-card">
+                    <div class="values-list">
+                        <div class="value-item">
+                            <div class="value-icon">📡</div>
+                            <div class="value-text">
+                                <h4>Consortium-Ready Partner</h4>
+                                <p>Formally integrated as your dissemination work package leader</p>
+                            </div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">💡</div>
+                            <div class="value-text">
+                                <h4>Multi-Channel Amplification</h4>
+                                <p>From CORDIS to scientific publications, conferences to social media</p>
+                            </div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🤝</div>
+                            <div class="value-text">
+                                <h4>Impact-Oriented Methodology</h4>
+                                <p>Measurable outreach aligned with EC reporting requirements</p>
+                            </div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🇪🇪</div>
+                            <div class="value-text">
+                                <h4>Based in Estonia, EU</h4>
+                                <p>Operating at the forefront of Europe's digital innovation ecosystem</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision & Mission Section -->
+    <section id="vision" class="vision-section">
+        <div class="vision-container">
+            <div class="vision-top">
+                <p class="section-label">Who We Are</p>
+                <h2 class="section-title">Vision & Mission</h2>
+            </div>
+
+            <div class="vision-cards">
+                <div class="vision-card">
+                    <span class="vision-card-label">Our Vision</span>
+                    <h3>Impact Without Boundaries</h3>
+                    <p>
+                        We envision a world where funded research and innovation generates impact far beyond its immediate boundaries — where every project leaves a <strong>traceable legacy</strong>, and every partner's contribution is recognised, amplified, and remembered.
+                        <br><br>
+                        We are committed to <strong>continuous learning and technological evolution</strong>, ensuring that our methods remain as dynamic as the landscape we operate in. We monitor emerging platforms, adopt new methodologies, and integrate relevant technologies — so our partners always benefit from what's current, without having to track it themselves.
+                    </p>
+                </div>
+
+                <div class="vision-card">
+                    <span class="vision-card-label">Our Mission</span>
+                    <h3>More Than Project Communication</h3>
+                    <p>
+                        We don't just communicate projects — we build the <strong>visibility infrastructure</strong> that lets each consortium member demonstrate their expertise, strengthen their institutional reputation, and grow their influence, project after project.
+                        <br><br>
+                        By embedding directly into consortia as a dedicated dissemination partner, we ensure that <strong>every partner's role, contribution, and knowledge</strong> is strategically communicated to the audiences that matter — peers, policymakers, industry, and society at large.
+                    </p>
+                </div>
+            </div>
+
+            <div class="vision-pillars">
+                <div class="vision-pillar">
+                    <span class="vision-pillar-icon">🔭</span>
+                    <h4>Continuous Innovation</h4>
+                    <p>We actively monitor emerging communication technologies and platforms to keep our methods ahead of the curve.</p>
+                </div>
+                <div class="vision-pillar">
+                    <span class="vision-pillar-icon">📈</span>
+                    <h4>Partner Visibility</h4>
+                    <p>Every consortium member's expertise and contribution is individually amplified — not just the project as a whole.</p>
+                </div>
+                <div class="vision-pillar">
+                    <span class="vision-pillar-icon">🌐</span>
+                    <h4>Global Reach</h4>
+                    <p>Our dissemination strategies transcend regional boundaries, targeting the stakeholders and audiences that drive real-world progress.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section with RSS Sidebar -->
+    <section id="services" class="services">
+        <div class="section-header">
+            <p class="section-label">Our Expertise</p>
+            <h2 class="section-title">Integrated EU Project Services</h2>
+            <p class="section-description">
+                From consortium-embedded dissemination to full-cycle proposal development, SIA Agency delivers specialised expertise across every dimension of the EU funding lifecycle.
+            </p>
+        </div>
+        <div class="content-with-sidebar">
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">📡</div>
+                    <h3>Dissemination & Communication</h3>
+                    <p>
+                        Our core competency. We integrate into your consortium as a dedicated dissemination partner — architecting, executing, and <strong>fully automating</strong> your multi-channel communication strategy. Your partners contribute to dissemination without ever having to manually track metrics, calculate reach, or compile reporting tables. We handle it all.
+                    </p>
+                    <ul class="service-features">
+                        <li>Consortium dissemination work package leadership</li>
+                        <li>Multi-channel outreach: LinkedIn, X, YouTube, CORDIS, newsletters, conferences & scientific publications</li>
+                        <li>Automated reach & engagement tracking across all channels — no manual counting for partners</li>
+                        <li>EC-compliant dissemination reports generated automatically, ready for submission</li>
+                        <li>Stakeholder mapping, targeting & engagement frameworks</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🎨</div>
+                    <h3>Visual Communication & Content Strategy</h3>
+                    <p>
+                        We translate complex research findings and technical innovation into compelling visual narratives that resonate with diverse audiences — from policymakers to the general public.
+                    </p>
+                    <ul class="service-features">
+                        <li>Data visualisation and scientific infographics</li>
+                        <li>Project identity, branding & digital presence</li>
+                        <li>Multimedia content production for all channels</li>
+                        <li>Promotional materials aligned with EU visibility guidelines</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📝</div>
+                    <h3>Proposal Development & Writing</h3>
+                    <p>
+                        Collaborating with seasoned EU funding specialists, we co-develop high-impact proposals that articulate scientific excellence, innovation potential, and societal relevance with precision and strategic clarity.
+                    </p>
+                    <ul class="service-features">
+                        <li>Project conceptualisation & theory of change design</li>
+                        <li>Technical narrative writing for Horizon Europe and beyond</li>
+                        <li>Budget architecture and financial compliance</li>
+                        <li>Peer review coordination and submission management</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🚀</div>
+                    <h3>Exploitation & Knowledge Transfer</h3>
+                    <p>
+                        Beyond dissemination, we help consortia translate project outcomes into lasting institutional and societal value — ensuring your results are adopted, replicated, and built upon well beyond the project lifecycle.
+                    </p>
+                    <ul class="service-features">
+                        <li>Exploitation strategy design & roadmapping</li>
+                        <li>Policy brief development and uptake pathways</li>
+                        <li>Open access and knowledge management compliance</li>
+                        <li>Post-project sustainability planning & legacy frameworks</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- RSS Sidebar -->
+            <aside class="rss-sidebar">
+                <div class="rss-widget">
+                    <h3>🔔 Live EU Funding Calls</h3>
+                    <p class="rss-subtitle">Updated from the EU Funding &amp; Tenders Portal</p>
+                    <div id="rssFeed" class="rss-feed">
+                        <div class="rss-loading">Loading latest calls...</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- Proposals Section -->
+    <section id="proposals" class="proposals">
+        <div class="section-header">
+            <p class="section-label">Active Collaborations</p>
+            <h2 class="section-title">Consortium Opportunities</h2>
+            <p class="section-description">
+                Explore the proposals we are currently developing or contributing to. We welcome enquiries from organisations seeking a structured dissemination partner or broader collaboration.
+            </p>
+        </div>
+        <div class="content-with-sidebar">
+            <div class="proposals-tabs">
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-tab="leading">Proposals We Lead</button>
+                    <button class="tab-btn" data-tab="involved">Consortium Member</button>
+                    <button class="tab-btn" data-tab="partners">Seeking Partners</button>
+                </div>
+
+                <!-- Tab: Proposals We Lead -->
+                <div class="tab-content active" id="leading">
+                    <div class="proposals-grid">
+                        <div class="proposal-card">
+                            <div class="proposal-header">
+                                <span class="proposal-program">Horizon Europe</span>
+                                <h3>Digital Skills for Green Transition</h3>
+                                <div class="proposal-meta">
+                                    <span>📅 Deadline: June 2026</span>
+                                    <span>💰 €2M Budget</span>
+                                </div>
+                            </div>
+                            <p class="proposal-description">
+                                A cross-national initiative developing advanced digital competency frameworks to accelerate the green economy transition across European SMEs — spanning circular economy practices, renewable energy management, and sustainable business model innovation.
+                            </p>
+                            <div class="positions-needed">
+                                <h4>Consortium Positions Open:</h4>
+                                <div class="position-tags">
+                                    <span class="position-tag" onclick="openContact('Technical Lead', 'Digital Skills for Green Transition')">Technical Lead</span>
+                                    <span class="position-tag" onclick="openContact('SME Partner', 'Digital Skills for Green Transition')">SME Partner</span>
+                                    <span class="position-tag" onclick="openContact('Training Provider', 'Digital Skills for Green Transition')">Training Provider</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="proposal-card">
+                            <div class="proposal-header">
+                                <span class="proposal-program">LIFE Programme</span>
+                                <h3>Urban Biodiversity Corridors</h3>
+                                <div class="proposal-meta">
+                                    <span>📅 Deadline: July 2026</span>
+                                    <span>💰 €1.5M Budget</span>
+                                </div>
+                            </div>
+                            <p class="proposal-description">
+                                Establishing interconnected ecological corridors within urban environments to strengthen biodiversity networks, enhance air quality indices, and deliver scalable climate adaptation solutions for mid-sized European municipalities.
+                            </p>
+                            <div class="positions-needed">
+                                <h4>Consortium Positions Open:</h4>
+                                <div class="position-tags">
+                                    <span class="position-tag" onclick="openContact('Ecological Consultant', 'Urban Biodiversity Corridors')">Ecological Consultant</span>
+                                    <span class="position-tag" onclick="openContact('City Municipality', 'Urban Biodiversity Corridors')">City Municipality</span>
+                                    <span class="position-tag" onclick="openContact('Research Institution', 'Urban Biodiversity Corridors')">Research Institution</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: We're Involved In -->
+                <div class="tab-content" id="involved">
+                    <div class="proposals-grid">
+                        <div class="proposal-card">
+                            <div class="proposal-header">
+                                <span class="proposal-program">Digital Europe</span>
+                                <h3>AI for Healthcare Accessibility</h3>
+                                <div class="proposal-meta">
+                                    <span>📅 Deadline: August 2026</span>
+                                    <span>💰 €3M Budget</span>
+                                </div>
+                            </div>
+                            <p class="proposal-description">
+                                Deploying AI-driven diagnostic and triage solutions to bridge healthcare accessibility gaps in rural and underserved communities across Europe, led by a multi-sectoral consortium of healthcare institutions and technology innovators.
+                            </p>
+                            <p style="margin-top: 1rem; color: var(--secondary); font-style: italic;">
+                                SIA Role: Dissemination &amp; Communication Work Package Lead
+                            </p>
+                        </div>
+
+                        <div class="proposal-card">
+                            <div class="proposal-header">
+                                <span class="proposal-program">Erasmus+</span>
+                                <h3>Digital Literacy for Seniors</h3>
+                                <div class="proposal-meta">
+                                    <span>📅 Deadline: May 2026</span>
+                                    <span>💰 €800K Budget</span>
+                                </div>
+                            </div>
+                            <p class="proposal-description">
+                                A pan-European lifelong learning programme designed to dismantle digital exclusion barriers among senior citizens, fostering digital autonomy and active participation through inclusive, technology-mediated learning pathways.
+                            </p>
+                            <p style="margin-top: 1rem; color: var(--secondary); font-style: italic;">
+                                SIA Role: Communication Strategy &amp; Automation Support
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Seeking Partners -->
+                <div class="tab-content" id="partners">
+                    <div class="proposals-grid">
+                        <div class="proposal-card">
+                            <div class="proposal-header">
+                                <span class="proposal-program">Horizon Europe</span>
+                                <h3>Circular Economy Platform</h3>
+                                <div class="proposal-meta">
+                                    <span>📅 Deadline: September 2026</span>
+                                    <span>💰 €2.5M Budget</span>
+                                </div>
+                            </div>
+                            <p class="proposal-description">
+                                A pan-European digital marketplace facilitating circular economy transactions, resource-sharing agreements, and industrial symbiosis between enterprises — addressing systemic waste reduction at scale.
+                            </p>
+                            <div class="positions-needed">
+                                <h4>Consortium Positions Open:</h4>
+                                <div class="position-tags">
+                                    <span class="position-tag" onclick="openContact('Technology Partner', 'Circular Economy Platform')">Technology Partner</span>
+                                    <span class="position-tag" onclick="openContact('Industrial Partner', 'Circular Economy Platform')">Industrial Partner</span>
+                                    <span class="position-tag" onclick="openContact('Research Organization', 'Circular Economy Platform')">Research Organisation</span>
+                                    <span class="position-tag" onclick="openContact('Coordinator', 'Circular Economy Platform')">Coordinator</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="proposal-card">
+                            <div class="proposal-header">
+                                <span class="proposal-program">Creative Europe</span>
+                                <h3>Digital Cultural Heritage</h3>
+                                <div class="proposal-meta">
+                                    <span>📅 Deadline: October 2026</span>
+                                    <span>💰 €1.2M Budget</span>
+                                </div>
+                            </div>
+                            <p class="proposal-description">
+                                Digitisation and immersive virtualisation of European cultural heritage assets, enabling equitable public access to museums, archaeological sites, and historical collections through cutting-edge XR technologies.
+                            </p>
+                            <div class="positions-needed">
+                                <h4>Consortium Positions Open:</h4>
+                                <div class="position-tags">
+                                    <span class="position-tag" onclick="openContact('Museum Partner', 'Digital Cultural Heritage')">Museum Partner</span>
+                                    <span class="position-tag" onclick="openContact('VR/AR Developer', 'Digital Cultural Heritage')">XR Developer</span>
+                                    <span class="position-tag" onclick="openContact('Cultural Organization', 'Digital Cultural Heritage')">Cultural Organisation</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 1px;"></div> <!-- Spacer for grid -->
+        </div>
+    </section>
+
+    <!-- Why SIA Section -->
+    <section id="about" class="why-sia">
+        <div class="why-grid">
+            <div class="why-content">
+                <h2>Why Invite SIA to Your Consortium?</h2>
+                <p class="why-text">
+                    SIA Agency was established with a focused mandate: to elevate the dissemination and communication standards of EU-funded projects. Headquartered in Tallinn, Estonia — one of Europe's most advanced digital ecosystems — we bring methodological rigour, cross-sectoral expertise, and a commitment to measurable impact to every consortium we join.
+                </p>
+                <div class="benefits">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🎯</div>
+                        <div class="benefit-text">
+                            <h4>Dissemination-First Philosophy</h4>
+                            <p>We treat communication not as an afterthought but as a core work package — strategically designed from day one of the proposal.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">💼</div>
+                        <div class="benefit-text">
+                            <h4>Adaptive Partnership Model</h4>
+                            <p>Whether embedded as WP leader or providing targeted support, our engagement model is calibrated to your consortium's structure and objectives.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🌍</div>
+                        <div class="benefit-text">
+                            <h4>Deep EU Regulatory Literacy</h4>
+                            <p>Comprehensive command of European Commission visibility requirements, open access mandates, and GDPR-compliant communication practices.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">⚡</div>
+                        <div class="benefit-text">
+                            <h4>Zero Reporting Burden for Partners</h4>
+                            <p>Our integrated dissemination infrastructure means consortium partners never manually track metrics or compile KPI tables — we deliver submission-ready reports automatically.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="why-image">
+                <div class="image-frame">
+                    <div class="placeholder-img">
+                        Building the Future
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="contact-container">
+            <div class="section-header">
+                <p class="section-label">Initiate a Collaboration</p>
+                <h2 class="section-title">Let's Build Something Together</h2>
+                <p class="section-description">
+                    Whether you are assembling a consortium and need a dedicated dissemination partner, developing a proposal, or seeking specialised EU project support — we welcome the conversation.
+                </p>
+            </div>
+            <div class="contact-form">
+                <form id="contactForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="organization">Organization</label>
+                            <input type="text" id="organization" name="organization">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">Select a subject...</option>
+                            <option value="join-proposal">I wish to join an ongoing proposal</option>
+                            <option value="join-consortium">Invite SIA to our consortium</option>
+                            <option value="hire-proposal">Commission a proposal development</option>
+                            <option value="hire-pm">Engage PM automation services</option>
+                            <option value="join-team">Explore joining the SIA team</option>
+                            <option value="other">Other enquiry</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="positionField">
+                        <label for="position">Position/Proposal Interest</label>
+                        <input type="text" id="position" name="position" placeholder="e.g., Technical Lead for Digital Skills Project">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" required placeholder="Please describe your project, consortium, or enquiry in as much detail as you find useful..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>SIA Agency</h3>
+                <p>Specialised dissemination, communication, and EU project services. Headquartered in Tallinn, Estonia — partnering with consortia and organisations across Europe to maximise the impact of EU-funded research and innovation.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="#services">Dissemination & Communication</a></li>
+                    <li><a href="#services">Visual Communication</a></li>
+                    <li><a href="#services">Proposal Development</a></li>
+                    <li><a href="#services">Exploitation & Knowledge Transfer</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#about">About SIA</a></li>
+                    <li><a href="#proposals">Proposals</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#">Work With Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="/cdn-cgi/l/email-protection#472e29212807342e266a26202229243e692232"><span class="__cf_email__" data-cfemail="5d34333b321d2e343c703c3a38333e24733828">[email&#160;protected]</span></a></li>
+                    <li>Tallinn, Estonia</li>
+                    <li>European Union</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 SIA Agency. Strategic Impact & Automation. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // RSS Feed Fetcher (Mock data - replace with actual RSS feed)
+        function loadRSSFeed() {
+            const rssFeed = document.getElementById('rssFeed');
+            
+            // Mock RSS data (replace with actual RSS parser)
+            const mockCalls = [
+                {
+                    title: "Horizon Europe - Digital and Emerging Technologies",
+                    program: "Horizon Europe",
+                    deadline: "April 15, 2026",
+                    budget: "€5M",
+                    link: "#"
+                },
+                {
+                    title: "LIFE - Circular Economy and Resource Efficiency",
+                    program: "LIFE",
+                    deadline: "May 20, 2026",
+                    budget: "€3M",
+                    link: "#"
+                },
+                {
+                    title: "Erasmus+ - Strategic Partnerships Education",
+                    program: "Erasmus+",
+                    deadline: "March 28, 2026",
+                    budget: "€1.2M",
+                    link: "#"
+                },
+                {
+                    title: "Digital Europe - Cybersecurity Skills",
+                    program: "Digital EU",
+                    deadline: "June 10, 2026",
+                    budget: "€4M",
+                    link: "#"
+                },
+                {
+                    title: "Creative Europe - Cross-border Cooperation",
+                    program: "Creative EU",
+                    deadline: "April 30, 2026",
+                    budget: "€800K",
+                    link: "#"
+                }
+            ];
+
+            // Render RSS items
+            rssFeed.innerHTML = mockCalls.map(call => `
+                <div class="rss-item" onclick="window.open('${call.link}', '_blank')">
+                    <div class="rss-item-title">${call.title}</div>
+                    <div class="rss-item-meta">
+                        <span>📅 ${call.deadline}</span>
+                        <span>💰 ${call.budget}</span>
+                    </div>
+                    <span class="rss-item-program">${call.program}</span>
+                </div>
+            `).join('');
+        }
+
+        // Load RSS feed on page load
+        setTimeout(loadRSSFeed, 1000);
+
+        // Tabs functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                button.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Function to open contact form with pre-filled position
+        function openContact(position, proposal) {
+            const contactSection = document.getElementById('contact');
+            const subjectField = document.getElementById('subject');
+            const positionField = document.getElementById('position');
+            const positionFieldGroup = document.getElementById('positionField');
+            
+            contactSection.scrollIntoView({ behavior: 'smooth' });
+            
+            subjectField.value = 'join-proposal';
+            positionField.value = position + ' - ' + proposal;
+            positionFieldGroup.classList.add('active');
+        }
+
+        // Show/hide position field based on subject selection
+        const subjectSelect = document.getElementById('subject');
+        const positionFieldGroup = document.getElementById('positionField');
+
+        subjectSelect.addEventListener('change', function() {
+            if (this.value === 'join-proposal') {
+                positionFieldGroup.classList.add('active');
+            } else {
+                positionFieldGroup.classList.remove('active');
+                document.getElementById('position').value = '';
+            }
+        });
+
+        // Form submission
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            alert('Thank you for your message! We will get back to you soon.');
+            this.reset();
+            positionFieldGroup.classList.remove('active');
+        });
+
+        // Add scroll-based animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.service-card, .benefit-item, .proposal-card, .rss-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Navbar background on scroll
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () =>
