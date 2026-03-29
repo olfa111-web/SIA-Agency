@@ -1804,14 +1804,11 @@
         });
     </script>
 
-    <!-- DATA LOADER — reads JSON files from this GitHub repo (written by admin.html) -->
+    <!-- DATA LOADER — reads from GitHub repo, updated by admin-olfa.html -->
     <script>
-        // ✏️ Same 3 values as in admin.html
-        const GH_OWNER  = olfa111-web;
-        const GH_REPO   = SIA-Agency;
+        const GH_OWNER  = "olfa111-web";
+        const GH_REPO   = "SIA-Agency";
         const GH_BRANCH = "main";
-        const DATA_PATH = "_data";
-
         const RAW = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${GH_BRANCH}`;
 
         async function ghRead(path) {
@@ -1822,6 +1819,118 @@
             } catch { return null; }
         }
 
+        function setText(sel, val) {
+            const el = document.querySelector(sel);
+            if (el && val) el.textContent = val;
+        }
+        function setHTML(sel, val) {
+            const el = document.querySelector(sel);
+            if (el && val) el.innerHTML = val;
+        }
+        function setAttr(sel, attr, val) {
+            const el = document.querySelector(sel);
+            if (el && val) el.setAttribute(attr, val);
+        }
+
+        // ── HERO ──────────────────────────────────────────────────────
+        function applyHero(h) {
+            if (!h) return;
+            setText('.hero-label',    h.label);
+            setText('.hero-subtitle', h.subtitle);
+            // Headline with highlight
+            const h1 = document.querySelector('.hero h1');
+            if (h1 && h.title) {
+                const parts = h.title.split(h.highlight || 'EU Project');
+                if (h.highlight && parts.length === 2) {
+                    h1.innerHTML = `${parts[0]}<span class="highlight">${h.highlight}</span>${parts[1]}`;
+                } else {
+                    h1.textContent = h.title;
+                }
+            }
+            // Buttons
+            const btns = document.querySelectorAll('.cta-group .btn');
+            if (btns[0]) { btns[0].textContent = h.btn1_text || btns[0].textContent; btns[0].href = h.btn1_link || btns[0].href; }
+            if (btns[1]) { btns[1].textContent = h.btn2_text || btns[1].textContent; btns[1].href = h.btn2_link || btns[1].href; }
+            // Value items (right card)
+            if (h.values && h.values.length) {
+                const list = document.querySelector('.values-list');
+                if (list) {
+                    list.innerHTML = h.values.map(v => `
+                        <div class="value-item">
+                            <div class="value-icon">${v.icon}</div>
+                            <div class="value-text">
+                                <h4>${v.title}</h4>
+                                <p>${v.desc}</p>
+                            </div>
+                        </div>`).join('');
+                }
+            }
+        }
+
+        // ── VISION ────────────────────────────────────────────────────
+        function applyVision(v) {
+            if (!v) return;
+            const cards = document.querySelectorAll('.vision-card');
+            if (cards[0]) {
+                const h3 = cards[0].querySelector('h3');
+                const p  = cards[0].querySelector('p');
+                if (h3 && v.vision_title)   h3.textContent = v.vision_title;
+                if (p  && v.vision_content) p.innerHTML    = v.vision_content;
+            }
+            if (cards[1]) {
+                const h3 = cards[1].querySelector('h3');
+                const p  = cards[1].querySelector('p');
+                if (h3 && v.mission_title)   h3.textContent = v.mission_title;
+                if (p  && v.mission_content) p.innerHTML    = v.mission_content;
+            }
+            // Pillars
+            if (v.pillars && v.pillars.length) {
+                const pillarsEl = document.querySelector('.vision-pillars');
+                if (pillarsEl) {
+                    pillarsEl.innerHTML = v.pillars.map(p => `
+                        <div class="vision-pillar">
+                            <span class="vision-pillar-icon">${p.icon}</span>
+                            <h4>${p.title}</h4>
+                            <p>${p.desc}</p>
+                        </div>`).join('');
+                }
+            }
+        }
+
+        // ── SERVICES ─────────────────────────────────────────────────
+        function applyServices(svcs) {
+            if (!svcs || !svcs.length) return;
+            const grid = document.querySelector('.services-grid');
+            if (!grid) return;
+            grid.innerHTML = svcs.map(s => `
+                <div class="service-card">
+                    <div class="service-icon">${s.icon || '📋'}</div>
+                    <h3>${s.title}</h3>
+                    <div>${s.desc || ''}</div>
+                    ${s.features && s.features.length ? `
+                    <ul class="service-features">
+                        ${s.features.map(f => `<li>${f}</li>`).join('')}
+                    </ul>` : ''}
+                </div>`).join('');
+        }
+
+        // ── FUNDING CALLS ─────────────────────────────────────────────
+        function applyFundingCalls(calls) {
+            if (!calls || !calls.length) return;
+            const el = document.getElementById('rssFeed');
+            if (!el) return;
+            el.innerHTML = calls.map(c => `
+                <div class="rss-item" onclick="window.open('${c.url || '#'}','_blank')">
+                    <div class="rss-item-title">${c.title}</div>
+                    <div class="rss-item-meta">
+                        <span>📅 ${c.deadline || '—'}</span>
+                        <span>💰 ${c.budget || '—'}</span>
+                    </div>
+                    <span class="rss-item-program">${c.program || ''}</span>
+                </div>`).join('');
+        }
+
+        // ── PROPOSALS ────────────────────────────────────────────────
         function proposalCard(p) {
             const positions = p.positions ? p.positions.split(',').map(s => s.trim()).filter(Boolean) : [];
             const posHTML = positions.length ? `
@@ -1842,60 +1951,126 @@
                             <span>💰 ${p.budget || '—'} Budget</span>
                         </div>
                     </div>
-                    <p class="proposal-description">${p.desc || p.description || ''}</p>
+                    <div class="proposal-description">${p.desc || p.description || ''}</div>
                     ${posHTML}${roleHTML}
                 </div>`;
         }
-
-        function callCard(c) {
-            return `
-                <div class="rss-item" onclick="window.open('${c.url || '#'}','_blank')">
-                    <div class="rss-item-title">${c.title}</div>
-                    <div class="rss-item-meta">
-                        <span>📅 ${c.deadline || '—'}</span>
-                        <span>💰 ${c.budget || '—'}</span>
-                    </div>
-                    <span class="rss-item-program">${c.program || ''}</span>
-                </div>`;
+        function applyProposals(props) {
+            if (!props) return;
+            const byType = { leading: [], involved: [], seeking: [] };
+            props.forEach(p => { if (byType[p.type]) byType[p.type].push(p); });
+            ['leading','involved','seeking'].forEach(type => {
+                const el = document.getElementById('proposals-' + type);
+                if (!el) return;
+                el.innerHTML = byType[type].length
+                    ? byType[type].map(proposalCard).join('')
+                    : '<p style="color:var(--secondary);padding:2rem 0;">No proposals listed yet.</p>';
+            });
         }
 
-        async function loadSiteData() {
-            // Settings
-            const settings = await ghRead(`${DATA_PATH}/settings.json`);
-            if (settings) {
-                const emailEl = document.getElementById('footer-email');
-                if (settings.contact_email && emailEl) {
-                    emailEl.href = 'mailto:' + settings.contact_email;
-                    emailEl.textContent = settings.contact_email;
-                }
-                if (settings.about_photo) {
-                    const img = document.getElementById('about-photo');
-                    const ph  = document.getElementById('about-placeholder');
-                    if (img) { img.src = settings.about_photo; img.style.display = 'block'; }
-                    if (ph)  ph.style.display = 'none';
+        // ── ABOUT ────────────────────────────────────────────────────
+        function applyAbout(a) {
+            if (!a) return;
+            const h2 = document.querySelector('.why-sia h2');
+            if (h2 && a.heading) h2.textContent = a.heading;
+            const intro = document.querySelector('.why-text');
+            if (intro && a.intro) intro.innerHTML = a.intro;
+            // Benefits
+            if (a.benefits && a.benefits.length) {
+                const benEl = document.querySelector('.benefits');
+                if (benEl) {
+                    benEl.innerHTML = a.benefits.map(b => `
+                        <div class="benefit-item">
+                            <div class="benefit-icon">${b.icon}</div>
+                            <div class="benefit-text">
+                                <h4>${b.title}</h4>
+                                <p>${b.desc}</p>
+                            </div>
+                        </div>`).join('');
                 }
             }
-
-            // Funding calls
-            const calls = await ghRead(`${DATA_PATH}/funding_calls.json`);
-            if (calls && calls.length) {
-                const el = document.getElementById('rssFeed');
-                if (el) el.innerHTML = calls.map(callCard).join('');
+            // About photo
+            if (a.photo) {
+                const img = document.getElementById('about-photo');
+                const ph  = document.getElementById('about-placeholder');
+                if (img) { img.src = a.photo; img.style.display = 'block'; }
+                if (ph)  ph.style.display = 'none';
             }
+        }
 
-            // Proposals
-            const props = await ghRead(`${DATA_PATH}/proposals.json`);
-            if (props) {
-                const byType = { leading: [], involved: [], seeking: [] };
-                props.forEach(p => { if (byType[p.type]) byType[p.type].push(p); });
-                ['leading','involved','seeking'].forEach(type => {
-                    const el = document.getElementById('proposals-' + type);
-                    if (!el) return;
-                    el.innerHTML = byType[type].length
-                        ? byType[type].map(proposalCard).join('')
-                        : '<p style="color:var(--secondary);padding:2rem 0;">No proposals listed yet.</p>';
+        // ── FOOTER ───────────────────────────────────────────────────
+        function applyFooter(f) {
+            if (!f) return;
+            const emailEl = document.getElementById('footer-email');
+            if (emailEl && f.email) {
+                emailEl.href = 'mailto:' + f.email;
+                emailEl.textContent = f.email;
+            }
+            // Location lines
+            const locItems = document.querySelectorAll('.footer-links:last-of-type li');
+            if (locItems[1] && f.loc1) locItems[1].textContent = f.loc1;
+            if (locItems[2] && f.loc2) locItems[2].textContent = f.loc2;
+            // Footer description
+            const desc = document.querySelector('.footer-brand p');
+            if (desc && f.desc) desc.textContent = f.desc;
+            // Copyright
+            const copy = document.querySelector('.footer-bottom p');
+            if (copy && f.copyright) copy.textContent = f.copyright;
+            // Social links — add them if provided
+            const brand = document.querySelector('.footer-brand');
+            if (brand && (f.linkedin || f.twitter || f.researchgate)) {
+                let existing = brand.querySelector('.footer-social');
+                if (!existing) {
+                    existing = document.createElement('div');
+                    existing.className = 'footer-social';
+                    existing.style.cssText = 'display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;';
+                    brand.appendChild(existing);
+                }
+                existing.innerHTML = [
+                    f.linkedin    ? `<a href="${f.linkedin}"    target="_blank" style="color:var(--accent);font-size:.9rem;text-decoration:none;">LinkedIn</a>` : '',
+                    f.twitter     ? `<a href="${f.twitter}"     target="_blank" style="color:var(--accent);font-size:.9rem;text-decoration:none;">X / Twitter</a>` : '',
+                    f.researchgate? `<a href="${f.researchgate}" target="_blank" style="color:var(--accent);font-size:.9rem;text-decoration:none;">ResearchGate</a>` : ''
+                ].filter(Boolean).join('');
+            }
+        }
+
+        // ── LOGO ─────────────────────────────────────────────────────
+        function applyLogo(l) {
+            if (!l) return;
+            if (l.url) {
+                // Replace text logos with image
+                document.querySelectorAll('.logo, .footer-brand h3').forEach(el => {
+                    el.innerHTML = `<img src="${l.url}" alt="${l.part1 || 'SIA'} ${l.part2 || 'Agency'}" style="height:36px;object-fit:contain;">`;
                 });
+            } else {
+                // Update text logo parts
+                document.querySelectorAll('.logo').forEach(el => {
+                    el.innerHTML = `${l.part1 || 'SIA'} <span>${l.part2 || 'Agency'}</span>`;
+                });
+                const footerBrandH3 = document.querySelector('.footer-brand h3');
+                if (footerBrandH3) footerBrandH3.textContent = `${l.part1 || 'SIA'} ${l.part2 || 'Agency'}`;
             }
+        }
+
+        // ── MAIN LOADER ───────────────────────────────────────────────
+        async function loadSiteData() {
+            const [content, services, calls, proposals] = await Promise.all([
+                ghRead('_data/content.json'),
+                ghRead('_data/services.json'),
+                ghRead('_data/funding_calls.json'),
+                ghRead('_data/proposals.json')
+            ]);
+
+            if (content) {
+                applyHero(content.hero);
+                applyVision(content.vision);
+                applyAbout(content.about);
+                applyFooter(content.footer);
+                applyLogo(content.logo);
+            }
+            applyServices(services);
+            applyFundingCalls(calls);
+            applyProposals(proposals);
         }
 
         loadSiteData();
