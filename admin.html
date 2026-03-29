@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIA Agency — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc, updateDoc }
+      from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL }
+      from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
+
+    // ✏️ REPLACE with your Firebase project config (see setup guide below)
+    const firebaseConfig = {
+      apiKey:            "YOUR_API_KEY",
+      authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId:         "YOUR_PROJECT_ID",
+      storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId:             "YOUR_APP_ID"
+    };
+
+    // ✏️ REPLACE with the Gmail address you want to allow as admin
+    const ADMIN_EMAIL = "YOUR_EMAIL@gmail.com";
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+    const storage = getStorage(app);
+
+    // ── Auth ──────────────────────────────────────────────────────────
+    window._fbSignIn = async () => {
+      try {
+        await signInWithPopup(auth, new GoogleAuthProvider());
+      } catch (e) { showToast("Login failed: " + e.message, "error"); }
+    };
+    window._fbSignOut = () => signOut(auth);
+
+    onAuthStateChanged(auth, user => {
+      if (user && user.email === ADMIN_EMAIL) {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("user-name").textContent = user.displayName || user.email;
+        document.getElementById("user-avatar").src = user.photoURL || "";
+        loadAll();
+      } else if (user) {
+        signOut(auth);
+        showToast("Access denied — wrong Google account.", "error");
+      } else {
+        document.getElementById("login-screen").style.display = "flex";
+        document.getElementById("app").style.display = "none";
+      }
+    });
+
+    // ── CORS proxy for link scraping ──────────────────────────────────
+    const PROXY = "https://api.allorigins.win/get?url=";
+
+    async function fetchHTML(url) {
+      const r = await fetch(PROXY + encodeURIComponent(url));
+      const j = await r.json();
+      return j.contents || "";
+    }
+
+    function parseMeta(html, url) {
+      const parser = new DOMParser();
+      const doc2 = parser.parseFromString(html, "text/html");
+      const get = (sel, attr = "content") => {
+        const el = doc2.querySelector(sel);
+        return el ? (attr === "text" ? el.textContent.trim() : el.getAttribute(attr)) || "" : "";
+      };
+      return {
+        title:       get('meta[property="og:title"]') || get('title', 'text') || "",
+        description: get('meta[property="og:description"]') || get('meta[name="description"]') || "",
+        image:       get('meta[property="og:image"]') || "",
+        source_url:  url
+      };
+    }
+
+    // ── Smart import from link ────────────────────────────────────────
+    window._importLink = async (type) => {
+      const inputId = type === "call" ? "call-link-input" : "proposal-link-input";
+      const url = document.getElementById(inputId).value.trim();
+      if (!url) return showToast("Please paste a URL first.", "error");
+
+      setLoading(inputId, true);
+      try {
+        const html = await fetchHTML(url);
+        const meta = parseMeta(html, url);
+
+        if (type === "call") {
+          fillIfEmpty("call-title",       meta.title);
+          fillIfEmpty("call-description", meta.description);
+          // try to extract deadline & budget from text
+          const text = html.replace(/<[^>]+>/g, " ");
+          const deadlineMatch = text.match(/deadline[:\s]+([A-Za-z0-9 ,]+202\d)/i);
+          const budgetMatch   = text.match(/€[\d.,]+\s*(million|m|k)?/i);
+          if (deadlineMatch) fillIfEmpty("call-deadline", deadlineMatch[1].trim());
+          if (budgetMatch)   fillIfEmpty("call-budget",   budgetMatch[0].trim());
+        } else {
+          fillIfEmpty("prop-title",       meta.title);
+          fillIfEmpty("prop-description", meta.description);
+          const text = html.replace(/<[^>]+>/g, " ");
+          const deadlineMatch = text.match(/deadline[:\s]+([A-Za-z0-9 ,]+202\d)/i);
+          const budgetMatch   = text.match(/€[\d.,]+\s*(million|m|k)?/i);
+          if (deadlineMatch) fillIfEmpty("prop-deadline", deadlineMatch[1].trim());
+          if (budgetMatch)   fillIfEmpty("prop-budget",   budgetMatch[0].trim());
+        }
+        showToast("Details imported! Fill in anything missing.", "success");
+      } catch(e) {
+        showToast("Couldn't fetch that URL — fill in manually.", "error");
+      }
+      setLoading(inputId, false);
+    };
+
+    function fillIfEmpty(id, val) {
+      const el = document.getElementById(id);
+      if (el && !el.value.trim() && val) el.value = val;
+    }
+
+    // ── SETTINGS ─────────────────────────────────────────────────────
+    async function loadSettings() {
+      const snap = await getDoc(doc(db, "site", "settings"));
+      if (snap.exists()) {
+        const d = snap.data();
+        document.getElementById("s-email").value     = d.contact_email  || "";
+        document.getElementById("s-linkedin").value  = d.linkedin       || "";
+        document.getElementById("s-twitter").value   = d.twitter        || "";
+        document.getElementById("s-photo").value     = d.about_photo    || "";
+        if (d.about_photo) {
+          document.getElementById("photo-preview").src = d.about_photo;
+          document.getElementById("photo-preview").style.display = "block";
+        }
+      }
+    }
+
+    window._saveSettings = async () => {
+      const btn = document.getElementById("btn-save-settings");
+      btn.textContent = "Saving…"; btn.disabled = true;
+      await setDoc(doc(db, "site", "settings"), {
+        contact_email: document.getElementById("s-email").value.trim(),
+        linkedin:      document.getElementById("s-linkedin").value.trim(),
+        twitter:       document.getElementById("s-twitter").value.trim(),
+        about_photo:   document.getElementById("s-photo").value.trim()
+      });
+      showToast("Settings saved!", "success");
+      btn.textContent = "Save Settings"; btn.disabled = false;
+    };
+
+    window._uploadPhoto = async (input) => {
+      const file = input.files[0];
+      if (!file) return;
+      showToast("Uploading photo…", "info");
+      const storageRef = ref(storage, "about/" + file.name);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      document.getElementById("s-photo").value = url;
+      document.getElementById("photo-preview").src = url;
+      document.getElementById("photo-preview").style.display = "block";
+      showToast("Photo uploaded!", "success");
+    };
+
+    // ── FUNDING CALLS ─────────────────────────────────────────────────
+    async function loadCalls() {
+      const snap = await getDocs(collection(db, "funding_calls"));
+      const list = document.getElementById("calls-list");
+      list.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        list.innerHTML += `
+          <div class="item-row">
+            <div class="item-info">
+              <span class="item-program">${data.program || ""}</span>
+              <strong>${data.title || "Untitled"}</strong>
+              <span class="item-meta">📅 ${data.deadline || "—"} &nbsp;💰 ${data.budget || "—"}</span>
+            </div>
+            <div class="item-actions">
+              ${data.source_url ? `<a href="${data.source_url}" target="_blank" class="btn-ghost">↗ Link</a>` : ""}
+              <button class="btn-danger" onclick="_deleteCall('${d.id}')">Delete</button>
+            </div>
+          </div>`;
+      });
+      if (snap.empty) list.innerHTML = "<p class='empty-state'>No funding calls yet. Add one below.</p>";
+    }
+
+    window._deleteCall = async (id) => {
+      if (!confirm("Delete this funding call?")) return;
+      await deleteDoc(doc(db, "funding_calls", id));
+      showToast("Deleted.", "success");
+      loadCalls();
+    };
+
+    window._saveCall = async () => {
+      const btn = document.getElementById("btn-save-call");
+      const data = {
+        title:       document.getElementById("call-title").value.trim(),
+        program:     document.getElementById("call-program").value,
+        deadline:    document.getElementById("call-deadline").value.trim(),
+        budget:      document.getElementById("call-budget").value.trim(),
+        description: document.getElementById("call-description").value.trim(),
+        source_url:  document.getElementById("call-link-input").value.trim()
+      };
+      if (!data.title) return showToast("Title is required.", "error");
+      btn.textContent = "Saving…"; btn.disabled = true;
+      await addDoc(collection(db, "funding_calls"), data);
+      showToast("Funding call added!", "success");
+      clearForm(["call-title","call-program","call-deadline","call-budget","call-description","call-link-input"]);
+      btn.textContent = "Add Call"; btn.disabled = false;
+      loadCalls();
+    };
+
+    // ── PROPOSALS ────────────────────────────────────────────────────
+    async function loadProposals() {
+      const snap = await getDocs(collection(db, "proposals"));
+      const list = document.getElementById("proposals-list");
+      list.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        list.innerHTML += `
+          <div class="item-row">
+            <div class="item-info">
+              <span class="item-program">${data.program || ""} · <em>${data.tab_label || data.type || ""}</em></span>
+              <strong>${data.title || "Untitled"}</strong>
+              <span class="item-meta">📅 ${data.deadline || "—"} &nbsp;💰 ${data.budget || "—"}</span>
+              ${data.positions ? `<span class="item-meta">👥 ${data.positions}</span>` : ""}
+              ${data.sia_role  ? `<span class="item-meta">🎯 SIA: ${data.sia_role}</span>` : ""}
+            </div>
+            <div class="item-actions">
+              ${data.source_url ? `<a href="${data.source_url}" target="_blank" class="btn-ghost">↗ Link</a>` : ""}
+              <button class="btn-danger" onclick="_deleteProposal('${d.id}')">Delete</button>
+            </div>
+          </div>`;
+      });
+      if (snap.empty) list.innerHTML = "<p class='empty-state'>No proposals yet. Add one below.</p>";
+    }
+
+    window._deleteProposal = async (id) => {
+      if (!confirm("Delete this proposal?")) return;
+      await deleteDoc(doc(db, "proposals", id));
+      showToast("Deleted.", "success");
+      loadProposals();
+    };
+
+    window._saveProposal = async () => {
+      const btn = document.getElementById("btn-save-proposal");
+      const type = document.getElementById("prop-type").value;
+      const typeLabels = { leading: "Proposals We Lead", involved: "Consortium Member", seeking: "Seeking Partners" };
+      const data = {
+        type,
+        tab_label:   typeLabels[type] || type,
+        title:       document.getElementById("prop-title").value.trim(),
+        program:     document.getElementById("prop-program").value,
+        deadline:    document.getElementById("prop-deadline").value.trim(),
+        budget:      document.getElementById("prop-budget").value.trim(),
+        description: document.getElementById("prop-description").value.trim(),
+        positions:   document.getElementById("prop-positions").value.trim(),
+        sia_role:    document.getElementById("prop-sia-role").value.trim(),
+        source_url:  document.getElementById("proposal-link-input").value.trim()
+      };
+      if (!data.title) return showToast("Title is required.", "error");
+      btn.textContent = "Saving…"; btn.disabled = true;
+      await addDoc(collection(db, "proposals"), data);
+      showToast("Proposal added!", "success");
+      clearForm(["prop-title","prop-program","prop-deadline","prop-budget","prop-description","prop-positions","prop-sia-role","proposal-link-input"]);
+      btn.textContent = "Add Proposal"; btn.disabled = false;
+      loadProposals();
+    };
+
+    // ── Helpers ───────────────────────────────────────────────────────
+    function clearForm(ids) { ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; }); }
+    function setLoading(id, on) {
+      const el = document.getElementById(id);
+      if (el) el.style.opacity = on ? "0.5" : "1";
+    }
+
+    function loadAll() { loadSettings(); loadCalls(); loadProposals(); }
+
+    window.showToast = (msg, type = "success") => {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.className = "toast show " + type;
+      setTimeout(() => t.classList.remove("show"), 3500);
+    };
+
+    // ── Toggle proposal-type-specific fields ──────────────────────────
+    window._onPropTypeChange = () => {
+      const type = document.getElementById("prop-type").value;
+      document.getElementById("field-positions").style.display = (type === "leading" || type === "seeking") ? "block" : "none";
+      document.getElementById("field-sia-role").style.display  = type === "involved" ? "block" : "none";
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg: #0d0f12;
+      --surface: #161920;
+      --surface2: #1e2229;
+      --border: rgba(255,255,255,0.07);
+      --accent: #3d9fdb;
+      --accent2: #5eb8f0;
+      --text: #e8eaf0;
+      --muted: #7a8190;
+      --success: #2ec27e;
+      --error: #e5534b;
+      --radius: 12px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Login Screen ── */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 60% 40%, #1a2a3a 0%, var(--bg) 65%);
+    }
+
+    .login-card {
+      text-align: center;
+      padding: 3.5rem 3rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    }
+
+    .login-card .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .login-card .logo span { color: var(--accent); }
+
+    .login-card p {
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+      font-size: 0.95rem;
+    }
+
+    .btn-google {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      background: white;
+      color: #333;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-google:hover { background: #f0f0f0; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+
+    .btn-google svg { width: 20px; height: 20px; }
+
+    /* ── App Layout ── */
+    #app { display: none; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,15,18,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+    }
+
+    .topbar-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+    }
+
+    .topbar-logo span { color: var(--accent); }
+
+    .topbar-logo small {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 400;
+      margin-left: 0.5rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    #user-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+    }
+
+    #user-name { font-size: 0.9rem; color: var(--muted); }
+
+    .btn-signout {
+      padding: 0.4rem 1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-signout:hover { border-color: var(--error); color: var(--error); }
+
+    /* ── Navigation Tabs ── */
+    .nav-tabs {
+      display: flex;
+      gap: 0.3rem;
+      padding: 1.5rem 2.5rem 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .nav-tab {
+      padding: 0.7rem 1.4rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: -1px;
+    }
+
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── Sections ── */
+    .sections { padding: 2.5rem; max-width: 900px; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Form Elements ── */
+    .field { margin-bottom: 1.2rem; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    select option { background: var(--surface2); }
+    textarea { resize: vertical; min-height: 90px; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* ── Import Link Row ── */
+    .import-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      align-items: flex-end;
+    }
+
+    .import-row .field { flex: 1; margin-bottom: 0; }
+
+    .btn-import {
+      padding: 0.75rem 1.4rem;
+      background: var(--surface2);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-import:hover { background: var(--accent); color: white; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      padding: 0.8rem 2rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-danger {
+      padding: 0.35rem 0.8rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-danger:hover { border-color: var(--error); color: var(--error); }
+
+    .btn-ghost {
+      padding: 0.35rem 0.8rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Item List ── */
+    .item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 0.7rem;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .item-info strong { font-size: 0.95rem; }
+
+    .item-program {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .item-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 1.5rem 0;
+      font-style: italic;
+    }
+
+    /* ── Photo Preview ── */
+    #photo-preview {
+      display: none;
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-top: 0.8rem;
+      border: 1px solid var(--border);
+    }
+
+    .upload-area {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .btn-upload {
+      padding: 0.6rem 1.2rem;
+      background: var(--surface2);
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-upload:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.8rem 0;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 0.9rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 9999;
+      max-width: 320px;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: var(--success); color: white; }
+    .toast.error   { background: var(--error);   color: white; }
+    .toast.info    { background: var(--accent);   color: white; }
+
+    @media (max-width: 640px) {
+      .topbar { padding: 1rem 1.2rem; }
+      .sections { padding: 1.5rem 1.2rem; }
+      .field-row { grid-template-columns: 1fr; }
+      .import-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo">SIA <span>Agency</span></div>
+    <p>Admin Panel — sign in with your Google account to continue.</p>
+    <button class="btn-google" onclick="_fbSignIn()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div id="app">
+
+  <div class="topbar">
+    <div class="topbar-logo">SIA <span>Agency</span> <small>Admin</small></div>
+    <div class="topbar-user">
+      <img id="user-avatar" src="" alt="avatar">
+      <span id="user-name"></span>
+      <button class="btn-signout" onclick="_fbSignOut()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('calls')">🔔 Funding Calls</button>
+    <button class="nav-tab" onclick="switchTab('proposals')">📋 Proposals</button>
+    <button class="nav-tab" onclick="switchTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <div class="sections">
+
+    <!-- ── FUNDING CALLS ── -->
+    <div class="section active" id="tab-calls">
+      <h2 class="section-title">EU Funding Calls</h2>
+      <p class="section-subtitle">Paste a link to a call page — details will auto-fill. Edit anything that's missing, then add it.</p>
+
+      <div class="card">
+        <div class="card-title">Add a New Call</div>
+        <div class="import-row">
+          <div class="field">
+            <label>Paste Call URL</label>
+            <input type="url" id="call-link-input" placeholder="https://ec.europa.eu/...">
+          </div>
+          <button class="btn-import" onclick="_importLink('call')">⬇ Auto-fill</button>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Title *</label>
+            <input type="text" id="call-title" placeholder="e.g. Horizon Europe — Digital Skills">
+          </div>
+          <div class="field">
+            <label>Programme</label>
+            <select id="call-program">
+              <option value="">Select…</option>
+              <option>Horizon Europe</option>
+              <option>LIFE</option>
+              <option>Erasmus+</option>
+              <option>Digital Europe</option>
+              <option>Creative Europe</option>
+              <option>Interreg</option>
+              <option>COSME</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Deadline</label>
+            <input type="text" id="call-deadline" placeholder="e.g. April 15, 2026">
+          </div>
+          <div class="field">
+            <label>Budget</label>
+            <input type="text" id="call-budget" placeholder="e.g. €2M">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Short Description (optional)</label>
+          <textarea id="call-description" placeholder="Brief summary of the call scope…"></textarea>
+        </div>
+
+        <button class="btn-primary" id="btn-save-call" onclick="_saveCall()">Add Call</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Current Calls</div>
+        <div id="calls-list"><p class="empty-state">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- ── PROPOSALS ── -->
+    <div class="section" id="tab-proposals">
+      <h2 class="section-title">Proposals</h2>
+      <p class="section-subtitle">Paste a link to a call or proposal page — details will auto-fill. Complete any missing fields.</p>
+
+      <div class="card">
+        <div class="card-title">Add a New Proposal</div>
+        <div class="import-row">
+          <div class="field">
+            <label>Paste Proposal / Call URL</label>
+            <input type="url" id="proposal-link-input" placeholder="https://…">
+          </div>
+          <button class="btn-import" onclick="_importLink('proposal')">⬇ Auto-fill</button>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Title *</label>
+            <input type="text" id="prop-title" placeholder="e.g. Digital Skills for Green Transition">
+          </div>
+          <div class="field">
+            <label>Tab / Type</label>
+            <select id="prop-type" onchange="_onPropTypeChange()">
+              <option value="leading">Proposals We Lead</option>
+              <option value="involved">Consortium Member</option>
+              <option value="seeking">Seeking Partners</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Programme</label>
+            <select id="prop-program">
+              <option value="">Select…</option>
+              <option>Horizon Europe</option>
+              <option>LIFE</option>
+              <option>Erasmus+</option>
+              <option>Digital Europe</option>
+              <option>Creative Europe</option>
+              <option>Interreg</option>
+              <option>COSME</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Deadline</label>
+            <input type="text" id="prop-deadline" placeholder="e.g. June 2026">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Budget</label>
+          <input type="text" id="prop-budget" placeholder="e.g. €2M">
+        </div>
+
+        <div class="field">
+          <label>Description</label>
+          <textarea id="prop-description" placeholder="Describe the project scope and objectives…"></textarea>
+        </div>
+
+        <div class="field" id="field-positions">
+          <label>Open Positions (comma-separated)</label>
+          <input type="text" id="prop-positions" placeholder="e.g. Technical Lead, SME Partner, Research Institution">
+        </div>
+
+        <div class="field" id="field-sia-role" style="display:none;">
+          <label>SIA's Role in this Consortium</label>
+          <input type="text" id="prop-sia-role" placeholder="e.g. Dissemination & Communication Work Package Lead">
+        </div>
+
+        <button class="btn-primary" id="btn-save-proposal" onclick="_saveProposal()">Add Proposal</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Current Proposals</div>
+        <div id="proposals-list"><p class="empty-state">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="section" id="tab-settings">
+      <h2 class="section-title">Site Settings</h2>
+      <p class="section-subtitle">These values appear on the live website automatically.</p>
+
+      <div class="card">
+        <div class="card-title">Contact</div>
+        <div class="field">
+          <label>Contact Email (Zoho)</label>
+          <input type="email" id="s-email" placeholder="hello@sia-agency.com">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Social Media Links</div>
+        <div class="field">
+          <label>LinkedIn URL</label>
+          <input type="url" id="s-linkedin" placeholder="https://linkedin.com/company/sia-agency">
+        </div>
+        <div class="field">
+          <label>X / Twitter URL</label>
+          <input type="url" id="s-twitter" placeholder="https://x.com/sia_agency">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">About Section Photo</div>
+        <div class="field">
+          <label>Image URL (or upload below)</label>
+          <input type="url" id="s-photo" placeholder="https://…">
+        </div>
+        <div class="upload-area">
+          <label class="btn-upload" for="photo-file">⬆ Upload from computer</label>
+          <input type="file" id="photo-file" accept="image/*" style="display:none" onchange="_uploadPhoto(this)">
+          <span style="font-size:0.8rem;color:var(--muted);">JPG, PNG or WebP — 800×600 px minimum recommended</span>
+        </div>
+        <img id="photo-preview" src="" alt="Preview">
+      </div>
+
+      <button class="btn-primary" id="btn-save-settings" onclick="_saveSettings()">Save Settings</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function switchTab(name) {
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById("tab-" + name).classList.add("active");
+    event.target.classList.add("active");
+  }
+</script>
+
+</body>
+</html>
