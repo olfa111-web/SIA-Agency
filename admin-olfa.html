@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIA Agency — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0d0f12;--surface:#161920;--surface2:#1e2229;--border:rgba(255,255,255,0.07);--accent:#3d9fdb;--accent2:#5eb8f0;--text:#e8eaf0;--muted:#7a8190;--success:#2ec27e;--error:#e5534b;--warning:#e5a550;--radius:12px;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 60% 40%,#1a2a3a 0%,var(--bg) 65%);}
+    .login-card{text-align:center;padding:3.5rem 3rem;background:var(--surface);border:1px solid var(--border);border-radius:20px;max-width:420px;width:90%;box-shadow:0 40px 80px rgba(0,0,0,.5);}
+    .logo{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;margin-bottom:.3rem;}
+    .logo span{color:var(--accent);}
+    .login-card>p{color:var(--muted);margin-bottom:2rem;font-size:.95rem;line-height:1.6;}
+    .config-note{background:rgba(61,159,219,.08);border:1px solid rgba(61,159,219,.2);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.8rem;text-align:left;display:none;}
+    .config-note p{font-size:.82rem;color:var(--muted);line-height:1.6;}
+    .config-note code{color:var(--accent);font-size:.8rem;background:rgba(61,159,219,.1);padding:.1rem .3rem;border-radius:4px;}
+    .btn-github{display:flex;align-items:center;justify-content:center;gap:.8rem;width:100%;padding:.9rem 1.5rem;background:#24292e;color:white;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+    .btn-github:hover{background:#2f363d;transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.4);}
+    .btn-github svg{width:22px;height:22px;fill:white;flex-shrink:0;}
+    .btn-github:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    #app{display:none;}
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(13,15,18,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;}
+    .topbar-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;}
+    .topbar-logo span{color:var(--accent);}
+    .topbar-logo small{font-family:'DM Sans',sans-serif;font-size:.7rem;color:var(--muted);font-weight:400;margin-left:.5rem;letter-spacing:1px;text-transform:uppercase;}
+    .topbar-user{display:flex;align-items:center;gap:1rem;}
+    #user-avatar{width:34px;height:34px;border-radius:50%;border:2px solid var(--accent);}
+    #user-name{font-size:.9rem;color:var(--muted);}
+    .btn-signout{padding:.4rem 1rem;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .btn-signout:hover{border-color:var(--error);color:var(--error);}
+    .nav-tabs{display:flex;gap:.3rem;padding:1.5rem 2.5rem 0;border-bottom:1px solid var(--border);overflow-x:auto;}
+    .nav-tab{padding:.7rem 1.4rem;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-size:.9rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif;margin-bottom:-1px;}
+    .nav-tab:hover{color:var(--text);}
+    .nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .sections{padding:2.5rem;max-width:900px;}
+    .section{display:none;}
+    .section.active{display:block;}
+    .section-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin-bottom:.4rem;}
+    .section-subtitle{color:var(--muted);font-size:.9rem;margin-bottom:2rem;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.8rem;margin-bottom:1.5rem;}
+    .card-title{font-size:.75rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem;}
+    .field{margin-bottom:1.2rem;}
+    .field:last-child{margin-bottom:0;}
+    label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px;}
+    input[type="text"],input[type="email"],input[type="url"],textarea,select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;color:var(--text);font-size:.95rem;font-family:'DM Sans',sans-serif;transition:border-color .2s;outline:none;}
+    input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+    select option{background:var(--surface2);}
+    textarea{resize:vertical;min-height:90px;}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .import-row{display:flex;gap:.8rem;margin-bottom:1.5rem;align-items:flex-end;}
+    .import-row .field{flex:1;margin-bottom:0;}
+    .btn-import{padding:.75rem 1.4rem;background:var(--surface2);border:1px solid var(--accent);color:var(--accent);border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .btn-import:hover{background:var(--accent);color:white;}
+    .btn-import:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-primary{padding:.8rem 2rem;background:var(--accent);color:white;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .btn-danger{padding:.35rem .8rem;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .btn-danger:hover{border-color:var(--error);color:var(--error);}
+    .btn-ghost{padding:.35rem .8rem;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;font-size:.8rem;text-decoration:none;font-family:'DM Sans',sans-serif;transition:all .2s;display:inline-block;}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+    .item-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.2rem;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:.7rem;}
+    .item-info{display:flex;flex-direction:column;gap:.25rem;}
+    .item-info strong{font-size:.95rem;}
+    .item-program{font-size:.75rem;color:var(--accent);font-weight:600;}
+    .item-meta{font-size:.8rem;color:var(--muted);}
+    .item-actions{display:flex;gap:.5rem;flex-shrink:0;}
+    .empty-state{color:var(--muted);font-size:.9rem;padding:1.5rem 0;font-style:italic;}
+    #photo-preview{display:none;width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:.8rem;border:1px solid var(--border);}
+    .upload-area{display:flex;gap:.8rem;align-items:center;margin-top:.5rem;}
+    .btn-upload{padding:.6rem 1.2rem;background:var(--surface2);border:1px dashed var(--border);color:var(--muted);border-radius:8px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
+    .btn-upload:hover{border-color:var(--accent);color:var(--accent);}
+    .saving-bar{display:none;position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));z-index:9999;animation:saveslide 1s ease-in-out infinite;}
+    @keyframes saveslide{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+    .toast{position:fixed;bottom:2rem;right:2rem;padding:.9rem 1.5rem;border-radius:10px;font-size:.9rem;font-weight:500;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:9999;max-width:340px;}
+    .toast.show{opacity:1;transform:translateY(0);}
+    .toast.success{background:var(--success);color:white;}
+    .toast.error{background:var(--error);color:white;}
+    .toast.info{background:var(--accent);color:white;}
+    .toast.warning{background:var(--warning);color:white;}
+    @media(max-width:640px){.topbar,.sections{padding:1rem 1.2rem;}.field-row{grid-template-columns:1fr;}.import-row{flex-direction:column;}#user-name{display:none;}}
+  </style>
+</head>
+<body>
+<div class="saving-bar" id="saving-bar"></div>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo">SIA <span>Agency</span></div>
+    <p>Enter your access token to continue.</p>
+    <div style="margin-bottom:1rem;text-align:left;">
+      <label style="display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px;">GitHub Personal Access Token</label>
+      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;color:var(--text);font-size:.95rem;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:.8rem;"
+        onkeydown="if(event.key==='Enter') submitToken()">
+      <button onclick="submitToken()" style="width:100%;padding:.9rem;background:var(--accent);color:white;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='var(--accent2)'" onmouseout="this.style.background='var(--accent)'">
+        Enter Admin Panel →
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">SIA <span>Agency</span> <small>Admin</small></div>
+    <div class="topbar-user">
+      <img id="user-avatar" src="" alt="">
+      <span id="user-name"></span>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('calls',this)">🔔 Funding Calls</button>
+    <button class="nav-tab" onclick="switchTab('proposals',this)">📋 Proposals</button>
+    <button class="nav-tab" onclick="switchTab('settings',this)">⚙️ Settings</button>
+  </div>
+  <div class="sections">
+
+    <div class="section active" id="tab-calls">
+      <h2 class="section-title">EU Funding Calls</h2>
+      <p class="section-subtitle">Paste a link — details auto-fill from the page. Complete anything missing, then add.</p>
+      <div class="card">
+        <div class="card-title">Add a New Call</div>
+        <div class="import-row">
+          <div class="field"><label>Paste Call URL</label><input type="url" id="call-url" placeholder="https://ec.europa.eu/..."></div>
+          <button class="btn-import" id="btn-af-call" onclick="autoFill('call')">⬇ Auto-fill</button>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Title *</label><input type="text" id="call-title" placeholder="e.g. Horizon Europe — Digital Skills"></div>
+          <div class="field"><label>Programme</label>
+            <select id="call-program"><option value="">Select…</option><option>Horizon Europe</option><option>LIFE</option><option>Erasmus+</option><option>Digital Europe</option><option>Creative Europe</option><option>Interreg</option><option>COSME</option><option>Other</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Deadline</label><input type="text" id="call-deadline" placeholder="e.g. April 15, 2026"></div>
+          <div class="field"><label>Budget</label><input type="text" id="call-budget" placeholder="e.g. €2M"></div>
+        </div>
+        <div class="field"><label>Short Description (optional)</label><textarea id="call-desc" placeholder="Brief summary…"></textarea></div>
+        <button class="btn-primary" id="btn-add-call" onclick="saveCall()">Add Call</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Current Calls</div>
+        <div id="calls-list"><p class="empty-state">Loading…</p></div>
+      </div>
+    </div>
+
+    <div class="section" id="tab-proposals">
+      <h2 class="section-title">Proposals</h2>
+      <p class="section-subtitle">Paste a link — details auto-fill. Choose the tab, complete the fields, add.</p>
+      <div class="card">
+        <div class="card-title">Add a New Proposal</div>
+        <div class="import-row">
+          <div class="field"><label>Paste Proposal / Call URL</label><input type="url" id="prop-url" placeholder="https://…"></div>
+          <button class="btn-import" id="btn-af-prop" onclick="autoFill('prop')">⬇ Auto-fill</button>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Title *</label><input type="text" id="prop-title" placeholder="e.g. Digital Skills for Green Transition"></div>
+          <div class="field"><label>Tab</label>
+            <select id="prop-type" onchange="onPropTypeChange()"><option value="leading">Proposals We Lead</option><option value="involved">Consortium Member</option><option value="seeking">Seeking Partners</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Programme</label>
+            <select id="prop-program"><option value="">Select…</option><option>Horizon Europe</option><option>LIFE</option><option>Erasmus+</option><option>Digital Europe</option><option>Creative Europe</option><option>Interreg</option><option>COSME</option><option>Other</option></select>
+          </div>
+          <div class="field"><label>Deadline</label><input type="text" id="prop-deadline" placeholder="e.g. June 2026"></div>
+        </div>
+        <div class="field"><label>Budget</label><input type="text" id="prop-budget" placeholder="e.g. €2M"></div>
+        <div class="field"><label>Description</label><textarea id="prop-desc" placeholder="Describe the project scope…"></textarea></div>
+        <div class="field" id="field-positions">
+          <label>Open Positions <span style="color:var(--muted);font-weight:400;text-transform:none;">(comma-separated)</span></label>
+          <input type="text" id="prop-positions" placeholder="e.g. Technical Lead, SME Partner">
+        </div>
+        <div class="field" id="field-sia-role" style="display:none;">
+          <label>SIA's Role</label>
+          <input type="text" id="prop-sia-role" placeholder="e.g. Dissemination & Communication WP Lead">
+        </div>
+        <button class="btn-primary" id="btn-add-prop" onclick="saveProposal()">Add Proposal</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Current Proposals</div>
+        <div id="proposals-list"><p class="empty-state">Loading…</p></div>
+      </div>
+    </div>
+
+    <div class="section" id="tab-settings">
+      <h2 class="section-title">Site Settings</h2>
+      <p class="section-subtitle">Changes go live on your website in ~30 seconds after saving.</p>
+      <div class="card">
+        <div class="card-title">Contact</div>
+        <div class="field"><label>Contact Email (Zoho)</label><input type="email" id="s-email" placeholder="hello@sia-agency.com"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Social Media</div>
+        <div class="field"><label>LinkedIn URL</label><input type="url" id="s-linkedin" placeholder="https://linkedin.com/company/sia-agency"></div>
+        <div class="field"><label>X / Twitter URL</label><input type="url" id="s-twitter" placeholder="https://x.com/sia_agency"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">About Section Photo</div>
+        <div class="field"><label>Image URL</label><input type="url" id="s-photo" placeholder="https://…" oninput="previewPhoto(this.value)"></div>
+        <div class="upload-area">
+          <label class="btn-upload" for="photo-file">⬆ Upload from computer</label>
+          <input type="file" id="photo-file" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+          <span style="font-size:.8rem;color:var(--muted);">JPG, PNG or WebP — min 800×600 px</span>
+        </div>
+        <img id="photo-preview" src="" alt="Preview">
+      </div>
+      <button class="btn-primary" id="btn-save-settings" onclick="saveSettings()">Save Settings</button>
+    </div>
+
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════
+// ✏️  FILL IN THESE 2 VALUES — then upload
+// ════════════════════════════════════════════
+const GH_OWNER  = "YOUR_USERNAME";    // your GitHub username
+const GH_REPO   = "YOUR_REPO_NAME";  // your repo name
+const GH_BRANCH = "main";            // or "master"
+const DATA_PATH = "_data";
+// ════════════════════════════════════════════
+
+const PROXY = "https://corsproxy.io/?";
+
+// ── Auth ──────────────────────────────────────
+function submitToken() {
+  const token = document.getElementById("token-input").value.trim();
+  if (!token) return toast("Please paste your token first.", "warning");
+  sessionStorage.setItem("gh_token", token);
+  loadUser();
+}
+
+function signOut() {
+  sessionStorage.removeItem("gh_token");
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+}
+
+function getToken() { return sessionStorage.getItem("gh_token"); }
+
+async function loadUser() {
+  try {
+    const res = await ghFetch("https://api.github.com/user");
+    if (!res.ok) throw new Error();
+    const u = await res.json();
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    document.getElementById("user-name").textContent = u.login;
+    document.getElementById("user-avatar").src = u.avatar_url;
+    loadAll();
+  } catch {
+    toast("Could not verify token — please try again.", "error");
+    sessionStorage.removeItem("gh_token");
+  }
+}
+
+// ── GitHub API ────────────────────────────────
+function ghFetch(url, opts = {}) {
+  return fetch(url, { ...opts, headers: { Authorization: "token " + getToken(), Accept: "application/vnd.github.v3+json", "Content-Type": "application/json", ...(opts.headers || {}) } });
+}
+
+async function readFile(path) {
+  const res = await ghFetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}`);
+  if (res.status === 404) return { data: null, sha: null };
+  const j = await res.json();
+  return { data: JSON.parse(atob(j.content.replace(/\n/g, ""))), sha: j.sha };
+}
+
+async function writeFile(path, content, sha) {
+  setSaving(true);
+  const body = { message: `admin: update ${path}`, content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))), branch: GH_BRANCH };
+  if (sha) body.sha = sha;
+  const res = await ghFetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`, { method: "PUT", body: JSON.stringify(body) });
+  setSaving(false);
+  if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
+}
+
+// ── Auto-fill ─────────────────────────────────
+async function autoFill(type) {
+  const url = document.getElementById(type === "call" ? "call-url" : "prop-url").value.trim();
+  if (!url) return toast("Paste a URL first.", "warning");
+  const btn = document.getElementById(type === "call" ? "btn-af-call" : "btn-af-prop");
+  btn.disabled = true; btn.textContent = "Fetching…";
+  try {
+    const html = await (await fetch(PROXY + encodeURIComponent(url))).text();
+    const d = new DOMParser().parseFromString(html, "text/html");
+    const m = (s, a = "content") => { const el = d.querySelector(s); return el ? (a === "text" ? el.textContent.trim() : el.getAttribute(a) || "") : ""; };
+    const title = m('meta[property="og:title"]') || m("title", "text");
+    const desc  = m('meta[property="og:description"]') || m('meta[name="description"]');
+    const txt   = html.replace(/<[^>]+>/g, " ");
+    const dl    = txt.match(/deadline[:\s]+([A-Za-z0-9 ,]+202\d)/i);
+    const bud   = txt.match(/\u20ac\s?[\d.,]+\s*(million|M|K)?/i);
+    const fill  = (id, v) => { const el = document.getElementById(id); if (el && !el.value.trim() && v) el.value = v.trim(); };
+    const p = type === "call" ? "call" : "prop";
+    fill(p+"-title", title); fill(p+"-desc", desc);
+    if (dl)  fill(p+"-deadline", dl[1]);
+    if (bud) fill(p+"-budget", bud[0]);
+    toast("Done! Fill in anything still empty.", "success");
+  } catch { toast("Couldn't fetch URL — fill in manually.", "warning"); }
+  btn.disabled = false; btn.textContent = "⬇ Auto-fill";
+}
+
+// ── Funding Calls ─────────────────────────────
+async function loadCalls() {
+  const { data } = await readFile(`${DATA_PATH}/funding_calls.json`);
+  const calls = data || [];
+  document.getElementById("calls-list").innerHTML = calls.length
+    ? calls.map((c,i) => `<div class="item-row"><div class="item-info"><span class="item-program">${c.program||""}</span><strong>${c.title}</strong><span class="item-meta">📅 ${c.deadline||"—"} &nbsp;💰 ${c.budget||"—"}</span></div><div class="item-actions">${c.url?`<a href="${c.url}" target="_blank" class="btn-ghost">↗</a>`:""}<button class="btn-danger" onclick="deleteCall(${i})">Delete</button></div></div>`).join("")
+    : `<p class="empty-state">No funding calls yet.</p>`;
+}
+
+async function saveCall() {
+  const title = document.getElementById("call-title").value.trim();
+  if (!title) return toast("Title is required.", "error");
+  const btn = document.getElementById("btn-add-call");
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const { data, sha } = await readFile(`${DATA_PATH}/funding_calls.json`);
+    const calls = data || [];
+    calls.push({ title, program: document.getElementById("call-program").value, deadline: document.getElementById("call-deadline").value.trim(), budget: document.getElementById("call-budget").value.trim(), desc: document.getElementById("call-desc").value.trim(), url: document.getElementById("call-url").value.trim() });
+    await writeFile(`${DATA_PATH}/funding_calls.json`, calls, sha);
+    ["call-title","call-program","call-deadline","call-budget","call-desc","call-url"].forEach(id => document.getElementById(id).value = "");
+    toast("Call added! Live in ~30 sec.", "success");
+    loadCalls();
+  } catch(e) { toast("Error: " + e.message, "error"); }
+  btn.disabled = false; btn.textContent = "Add Call";
+}
+
+async function deleteCall(i) {
+  if (!confirm("Delete this call?")) return;
+  const { data, sha } = await readFile(`${DATA_PATH}/funding_calls.json`);
+  const calls = data || []; calls.splice(i,1);
+  await writeFile(`${DATA_PATH}/funding_calls.json`, calls, sha);
+  toast("Deleted.", "success"); loadCalls();
+}
+
+// ── Proposals ────────────────────────────────
+const TAB_LABELS = { leading:"Proposals We Lead", involved:"Consortium Member", seeking:"Seeking Partners" };
+
+async function loadProposals() {
+  const { data } = await readFile(`${DATA_PATH}/proposals.json`);
+  const props = data || [];
+  document.getElementById("proposals-list").innerHTML = props.length
+    ? props.map((p,i) => `<div class="item-row"><div class="item-info"><span class="item-program">${p.program||""} · <em style="color:var(--muted)">${TAB_LABELS[p.type]||p.type}</em></span><strong>${p.title}</strong><span class="item-meta">📅 ${p.deadline||"—"} &nbsp;💰 ${p.budget||"—"}</span>${p.positions?`<span class="item-meta">👥 ${p.positions}</span>`:""} ${p.sia_role?`<span class="item-meta">🎯 ${p.sia_role}</span>`:""}</div><div class="item-actions">${p.url?`<a href="${p.url}" target="_blank" class="btn-ghost">↗</a>`:""}<button class="btn-danger" onclick="deleteProposal(${i})">Delete</button></div></div>`).join("")
+    : `<p class="empty-state">No proposals yet.</p>`;
+}
+
+async function saveProposal() {
+  const title = document.getElementById("prop-title").value.trim();
+  if (!title) return toast("Title is required.", "error");
+  const btn = document.getElementById("btn-add-prop");
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const { data, sha } = await readFile(`${DATA_PATH}/proposals.json`);
+    const props = data || [];
+    props.push({ title, type: document.getElementById("prop-type").value, program: document.getElementById("prop-program").value, deadline: document.getElementById("prop-deadline").value.trim(), budget: document.getElementById("prop-budget").value.trim(), desc: document.getElementById("prop-desc").value.trim(), positions: document.getElementById("prop-positions").value.trim(), sia_role: document.getElementById("prop-sia-role").value.trim(), url: document.getElementById("prop-url").value.trim() });
+    await writeFile(`${DATA_PATH}/proposals.json`, props, sha);
+    ["prop-title","prop-program","prop-deadline","prop-budget","prop-desc","prop-positions","prop-sia-role","prop-url"].forEach(id => document.getElementById(id).value = "");
+    toast("Proposal added! Live in ~30 sec.", "success");
+    loadProposals();
+  } catch(e) { toast("Error: " + e.message, "error"); }
+  btn.disabled = false; btn.textContent = "Add Proposal";
+}
+
+async function deleteProposal(i) {
+  if (!confirm("Delete this proposal?")) return;
+  const { data, sha } = await readFile(`${DATA_PATH}/proposals.json`);
+  const props = data || []; props.splice(i,1);
+  await writeFile(`${DATA_PATH}/proposals.json`, props, sha);
+  toast("Deleted.", "success"); loadProposals();
+}
+
+// ── Settings ──────────────────────────────────
+async function loadSettings() {
+  const { data } = await readFile(`${DATA_PATH}/settings.json`);
+  if (!data) return;
+  document.getElementById("s-email").value    = data.contact_email || "";
+  document.getElementById("s-linkedin").value = data.linkedin      || "";
+  document.getElementById("s-twitter").value  = data.twitter       || "";
+  document.getElementById("s-photo").value    = data.about_photo   || "";
+  if (data.about_photo) previewPhoto(data.about_photo);
+}
+
+async function saveSettings() {
+  const btn = document.getElementById("btn-save-settings");
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const { sha } = await readFile(`${DATA_PATH}/settings.json`);
+    await writeFile(`${DATA_PATH}/settings.json`, { contact_email: document.getElementById("s-email").value.trim(), linkedin: document.getElementById("s-linkedin").value.trim(), twitter: document.getElementById("s-twitter").value.trim(), about_photo: document.getElementById("s-photo").value.trim() }, sha);
+    toast("Settings saved! Live in ~30 sec.", "success");
+  } catch(e) { toast("Error: " + e.message, "error"); }
+  btn.disabled = false; btn.textContent = "Save Settings";
+}
+
+async function uploadPhoto(input) {
+  const file = input.files[0]; if (!file) return;
+  toast("Uploading…", "info");
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const b64  = e.target.result.split(",")[1];
+    const path = `images/${Date.now()}-${file.name.replace(/\s+/g,"_")}`;
+    try {
+      await ghFetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`, { method:"PUT", body: JSON.stringify({ message:"admin: upload photo", content: b64, branch: GH_BRANCH }) });
+      const url = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${GH_BRANCH}/${path}`;
+      document.getElementById("s-photo").value = url;
+      previewPhoto(url);
+      toast("Photo uploaded!", "success");
+    } catch { toast("Upload failed — try pasting a URL instead.", "error"); }
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewPhoto(url) {
+  const img = document.getElementById("photo-preview");
+  img.src = url; img.style.display = url ? "block" : "none";
+}
+
+// ── UI ────────────────────────────────────────
+function onPropTypeChange() {
+  const t = document.getElementById("prop-type").value;
+  document.getElementById("field-positions").style.display = t !== "involved" ? "block" : "none";
+  document.getElementById("field-sia-role").style.display  = t === "involved"  ? "block" : "none";
+}
+function switchTab(name, el) {
+  document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.getElementById("tab-"+name).classList.add("active");
+  el.classList.add("active");
+}
+function setSaving(on) { document.getElementById("saving-bar").style.display = on ? "block" : "none"; }
+function toast(msg, type="success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = "toast show "+type;
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+function loadAll() { loadCalls(); loadProposals(); loadSettings(); }
+
+// ── Init ──────────────────────────────────────
+if (getToken()) loadUser();
+</script>
+</body>
+</html>
