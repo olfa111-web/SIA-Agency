@@ -3,49 +3,93 @@
     "label": "Strategic Impact & Automation",
     "title": "Your Consortium Partner for EU Project Dissemination",
     "highlight": "EU Project",
-    "subtitle": "SIA Agency embeds dissemination expertise directly into your consortium — ensuring your EU-funded research and innovation reaches the stakeholders, policymakers, and communities that matter most.",
+    "subtitle": "SIA Agency embeds dissemination expertise directly into your consortium â ensuring your EU-funded research and innovation reaches the stakeholders, policymakers, and communities that matter most.",
     "btn1_text": "Invite Us to Your Consortium",
     "btn1_link": "#contact",
     "btn2_text": "Explore Collaborations",
     "btn2_link": "#proposals",
     "values": [
-      { "icon": "📡", "title": "Consortium-Ready Partner", "desc": "Formally integrated as your dissemination work package leader" },
-      { "icon": "💡", "title": "Multi-Channel Amplification", "desc": "From CORDIS to scientific publications, conferences to social media" },
-      { "icon": "🤝", "title": "Impact-Oriented Methodology", "desc": "Measurable outreach aligned with EC reporting requirements" },
-      { "icon": "🇪🇪", "title": "Based in Estonia, EU", "desc": "Operating at the forefront of Europe's digital innovation ecosystem" }
+      {
+        "icon": "ð¡",
+        "title": "Consortium-Ready Partner",
+        "desc": "Formally integrated as your dissemination work package leader"
+      },
+      {
+        "icon": "ð¡",
+        "title": "Multi-Channel Amplification",
+        "desc": "From CORDIS to scientific publications, conferences to social media"
+      },
+      {
+        "icon": "ð¤",
+        "title": "Impact-Oriented Methodology",
+        "desc": "Measurable outreach aligned with EC reporting requirements"
+      },
+      {
+        "icon": "ðªðª",
+        "title": "Based in Estonia, EU",
+        "desc": "Operating at the forefront of Europe's digital innovation ecosystem"
+      }
     ]
   },
   "vision": {
     "vision_title": "Impact Without Boundaries",
-    "vision_content": "<p>We envision a world where funded research and innovation generates impact far beyond its immediate boundaries — where every project leaves a <strong>traceable legacy</strong>, and every partner's contribution is recognised, amplified, and remembered.</p>",
+    "vision_content": "<p>We envision a world where funded research and innovation generates impact far beyond its immediate boundaries â where every project leaves a <strong>traceable legacy</strong>, and every partner's contribution is recognised, amplified, and remembered.</p>",
     "mission_title": "More Than Project Communication",
-    "mission_content": "<p>We don't just communicate projects — we build the <strong>visibility infrastructure</strong> that lets each consortium member demonstrate their expertise, strengthen their institutional reputation, and grow their influence, project after project.</p>",
+    "mission_content": "<p>We don't just communicate projects â we build the <strong>visibility infrastructure</strong> that lets each consortium member demonstrate their expertise, strengthen their institutional reputation, and grow their influence, project after project.</p>",
     "pillars": [
-      { "icon": "🔭", "title": "Continuous Innovation", "desc": "We actively monitor emerging communication technologies and platforms." },
-      { "icon": "📈", "title": "Partner Visibility", "desc": "Every consortium member's expertise and contribution is individually amplified." },
-      { "icon": "🌐", "title": "Global Reach", "desc": "Our strategies transcend regional boundaries, targeting stakeholders that drive real-world progress." }
+      {
+        "icon": "ð­",
+        "title": "Continuous Innovation",
+        "desc": "We actively monitor emerging communication technologies and platforms."
+      },
+      {
+        "icon": "ð",
+        "title": "Partner Visibility",
+        "desc": "Every consortium member's expertise and contribution is individually amplified."
+      },
+      {
+        "icon": "ð",
+        "title": "Global Reach",
+        "desc": "Our strategies transcend regional boundaries, targeting stakeholders that drive real-world progress."
+      }
     ]
   },
   "about": {
     "heading": "Why Invite SIA to Your Consortium?",
-    "intro": "<p>SIA Agency was established with a focused mandate: to elevate the dissemination and communication standards of EU-funded projects. Headquartered in Tallinn, Estonia — one of Europe's most advanced digital ecosystems.</p>",
+    "intro": "<p>SIA Agency was established with a focused mandate: to elevate the dissemination and communication standards of EU-funded projects. Headquartered in Tallinn, Estonia â one of Europe's most advanced digital ecosystems.</p>",
     "photo": "",
     "benefits": [
-      { "icon": "🎯", "title": "Dissemination-First Philosophy", "desc": "We treat communication not as an afterthought but as a core work package." },
-      { "icon": "💼", "title": "Adaptive Partnership Model", "desc": "Our engagement model is calibrated to your consortium's structure and objectives." },
-      { "icon": "🌍", "title": "Deep EU Regulatory Literacy", "desc": "Comprehensive command of European Commission visibility requirements." },
-      { "icon": "⚡", "title": "Zero Reporting Burden for Partners", "desc": "Consortium partners never manually track metrics — we deliver submission-ready reports." }
+      {
+        "icon": "ð¯",
+        "title": "Dissemination-First Philosophy",
+        "desc": "We treat communication not as an afterthought but as a core work package."
+      },
+      {
+        "icon": "ð¼",
+        "title": "Adaptive Partnership Model",
+        "desc": "Our engagement model is calibrated to your consortium's structure and objectives."
+      },
+      {
+        "icon": "ð",
+        "title": "Deep EU Regulatory Literacy",
+        "desc": "Comprehensive command of European Commission visibility requirements."
+      },
+      {
+        "icon": "â¡",
+        "title": "Zero Reporting Burden for Partners",
+        "desc": "Consortium partners never manually track metrics â we deliver submission-ready reports."
+      }
     ]
   },
   "footer": {
-    "email": "",
+    "email": "contact@sia-agency.ee",
     "loc1": "Tallinn, Estonia",
     "loc2": "European Union",
-    "linkedin": "",
+    "linkedin": "https://www.linkedin.com/company/sia-agency",
     "twitter": "",
     "researchgate": "",
-    "desc": "Specialised dissemination, communication, and EU project services. Headquartered in Tallinn, Estonia — partnering with consortia and organisations across Europe.",
-    "copyright": "© 2026 SIA Agency. Strategic Impact & Automation. All rights reserved."
+    "desc": "Specialised dissemination, communication, and EU project services. Headquartered in Tallinn, Estonia â partnering with consortia and organisations across Europe.",
+    "copyright": "Â© 2026 SIA Agency. Strategic Impact & Automation Agency. All rights reserved."
   },
   "logo": {
     "part1": "SIA",
