@@ -1729,53 +1729,33 @@
             }
         });
 
-        // ✏️ UPDATE — CONTACT FORM: Choose ONE of the two options below and delete the other.
-        //
-        // ── OPTION A: Zoho Forms (recommended if you built a form in Zoho Forms) ──────────────
-        // 1. Go to Zoho Forms → your form → Share → Embed.
-        // 2. Copy the form's "Action URL" (looks like https://forms.zohopublic.eu/…/formperma/…)
-        //    and paste it as the `action` attribute in the <form id="contactForm"> tag above.
-        // 3. Map each input's `name` attribute to match the field names Zoho expects
-        //    (you can find these in Zoho Forms → Edit → each field's "Field Name" property).
-        // 4. Delete the fetch() block in Option B below and keep only Option A.
-        //    The form will submit natively — no JS needed — and Zoho will send you an email.
-        //
-        // ── OPTION B: Zoho Mail SMTP via EmailJS (no backend needed) ─────────────────────────
-        // 1. Create a free account at https://www.emailjs.com
-        // 2. Add a new Email Service → connect your Zoho Mail SMTP account.
-        // 3. Create an Email Template that maps {{name}}, {{email}}, {{message}}, etc.
-        // 4. Replace the three placeholders below:
-        //      YOUR_EMAILJS_SERVICE_ID   → e.g. "service_abc123"
-        //      YOUR_EMAILJS_TEMPLATE_ID  → e.g. "template_xyz789"
-        //      YOUR_EMAILJS_PUBLIC_KEY   → found in EmailJS → Account → API Keys
-        // 5. Add this script tag just before </body>:
-        //    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-        //    <script>emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");</script>
-
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
+        // Contact form — sends to contact@sia-agency.ee via Formspree
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = this.querySelector('.submit-btn');
-            btn.textContent = 'Sending…';
+            btn.textContent = 'Sending\u2026';
             btn.disabled = true;
 
-            // ── OPTION B code (delete this block if you chose Option A) ──
-            emailjs.sendForm(
-                'YOUR_EMAILJS_SERVICE_ID',    // ✏️ replace
-                'YOUR_EMAILJS_TEMPLATE_ID',   // ✏️ replace
-                this
-            ).then(() => {
-                btn.textContent = 'Message Sent ✓';
-                this.reset();
-                positionFieldGroup.classList.remove('active');
-            }).catch((err) => {
-                console.error('EmailJS error:', err);
-                btn.textContent = 'Error — please try again';
+            try {
+                const res = await fetch('https://formspree.io/f/contact@sia-agency.ee', {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    btn.textContent = 'Message Sent \u2713';
+                    this.reset();
+                    positionFieldGroup.classList.remove('active');
+                } else {
+                    throw new Error('failed');
+                }
+            } catch {
+                btn.textContent = 'Error \u2014 please try again';
                 btn.disabled = false;
-            });
-            // ── end Option B ──
+            }
         });
 
-        // Add scroll-based animations
+        // Scroll-based animations
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -100px 0px'
@@ -1799,7 +1779,7 @@
 
         // Navbar background on scroll
         const nav = document.querySelector('nav');
-        window.addEventListener('scroll', () =>
+        window.addEventListener('scroll', () => {
             nav.style.boxShadow = window.scrollY > 50 ? '0 2px 20px rgba(26,26,26,0.1)' : 'none';
         });
     </script>
